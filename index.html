@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Калькулятор оценки стоимости сайта - рассчитайте обоснованную цену вашего веб-проекта на основе взвешенной модели">
+    <meta name="keywords" content="калькулятор стоимости сайта, оценка сайта, цена веб-проекта, расчёт стоимости">
+    <title>Калькулятор оценки стоимости сайта</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #818cf8;
+            --secondary: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Main Layout */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            border: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .icon {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .tooltip-trigger {
+            width: 18px;
+            height: 18px;
+            background: var(--text-muted);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            cursor: help;
+            position: relative;
+        }
+
+        .tooltip-trigger:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 400;
+            white-space: nowrap;
+            max-width: 250px;
+            white-space: normal;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .currency {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 14px 50px 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Weight Controls */
+        .weight-section {
+            background: #f1f5f9;
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            margin-top: 28px;
+        }
+
+        .weight-section-title {
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .weight-total {
+            font-size: 0.9rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .weight-total.valid {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .weight-total.invalid {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .weight-group {
+            margin-bottom: 18px;
+        }
+
+        .weight-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .weight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .weight-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .weight-value {
+            font-weight: 600;
+            font-size: 0.95rem;
+            min-width: 45px;
+            text-align: right;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #cbd5e1;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        /* Presets */
+        .presets {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .preset-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Result Card */
+        .result-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            position: sticky;
+            top: 20px;
+        }
+
+        .result-card .card-title {
+            color: white;
+        }
+
+        .result-card .card-title .icon {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .final-price {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 24px;
+        }
+
+        .final-price-label {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .final-price-value {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .price-range {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 16px;
+            font-size: 0.95rem;
+        }
+
+        .price-range span {
+            opacity: 0.85;
+        }
+
+        /* Contribution Table */
+        .contribution-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .contribution-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            font-size: 0.9rem;
+            align-items: center;
+        }
+
+        .contribution-row:last-child {
+            border-bottom: none;
+        }
+
+        .contribution-row.header {
+            opacity: 0.7;
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .contribution-row .source {
+            font-weight: 500;
+        }
+
+        .contribution-row .value {
+            text-align: right;
+            min-width: 80px;
+        }
+
+        /* Visualization Bars */
+        .viz-section {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .viz-title {
+            font-weight: 600;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+        }
+
+        .viz-bar-container {
+            margin-bottom: 14px;
+        }
+
+        .viz-bar-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            opacity: 0.9;
+        }
+
+        .viz-bar {
+            height: 12px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .viz-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+
+        .viz-bar-fill.developer {
+            background: #fbbf24;
+        }
+
+        .viz-bar-fill.independent {
+            background: #34d399;
+        }
+
+        .viz-bar-fill.market {
+            background: #60a5fa;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 14px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+        }
+
+        /* Info Section */
+        .info-section {
+            margin-top: 40px;
+        }
+
+        .info-card {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius);
+            padding: 24px;
+        }
+
+        .info-card h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p {
+            color: #1e40af;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .info-card ul {
+            margin-top: 12px;
+            margin-left: 20px;
+            color: #1e40af;
+        }
+
+        .info-card li {
+            margin-bottom: 6px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Currency Switcher */
+        .currency-switcher {
+            display: flex;
+            gap: 4px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .currency-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            color: var(--text-muted);
+        }
+
+        .currency-btn.active {
+            background: white;
+            color: var(--text);
+            box-shadow: var(--shadow);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .pulse {
+            animation: pulse 0.3s ease;
+        }
+
+        /* Print styles */
+        @media print {
+            header {
+                background: var(--primary) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .result-card {
+                background: var(--primary) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📊 Калькулятор оценки стоимости сайта</h1>
+        <p>Рассчитайте обоснованную цену вашего веб-проекта на основе взвешенной модели оценок</p>
+    </header>
+
+    <main class="container">
+        <div class="calculator-grid">
+            <!-- Input Section -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="icon">₽</span>
+                    Исходные данные
+                </h2>
+
+                <!-- Currency Switcher -->
+                <div class="currency-switcher">
+                    <button class="currency-btn active" data-currency="RUB">₽ Рубли</button>
+                    <button class="currency-btn" data-currency="USD">$ Доллары</button>
+                    <button class="currency-btn" data-currency="EUR">€ Евро</button>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Запрос разработчика
+                        <span class="tooltip-trigger" data-tooltip="Сумма, которую разработчик или студия запрашивает за проект">?</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="number" id="developerPrice" placeholder="Введите сумму" min="0" step="1000" value="500000">
+                        <span class="currency" id="currencySymbol1">₽</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Независимая оценка
+                        <span class="tooltip-trigger" data-tooltip="Оценка от независимого эксперта или агентства">?</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="number" id="independentPrice" placeholder="Введите сумму" min="0" step="1000" value="450000">
+                        <span class="currency" id="currencySymbol2">₽</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Рыночный минимум
+                        <span class="tooltip-trigger" data-tooltip="Минимальная цена за аналогичный проект на рынке">?</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="number" id="marketPrice" placeholder="Введите сумму" min="0" step="1000" value="350000">
+                        <span class="currency" id="currencySymbol3">₽</span>
+                    </div>
+                </div>
+
+                <!-- Weight Section -->
+                <div class="weight-section">
+                    <div class="weight-section-title">
+                        <span>⚖️ Настройка весов</span>
+                        <span class="weight-total valid" id="weightTotal">100%</span>
+                    </div>
+
+                    <div class="weight-group">
+                        <div class="weight-header">
+                            <span class="weight-label">Вес разработчика</span>
+                            <span class="weight-value" id="developerWeightValue">40%</span>
+                        </div>
+                        <input type="range" id="developerWeight" min="0" max="100" value="40">
+                    </div>
+
+                    <div class="weight-group">
+                        <div class="weight-header">
+                            <span class="weight-label">Вес независимой оценки</span>
+                            <span class="weight-value" id="independentWeightValue">30%</span>
+                        </div>
+                        <input type="range" id="independentWeight" min="0" max="100" value="30">
+                    </div>
+
+                    <div class="weight-group">
+                        <div class="weight-header">
+                            <span class="weight-label">Вес рынка</span>
+                            <span class="weight-value" id="marketWeightValue">30%</span>
+                        </div>
+                        <input type="range" id="marketWeight" min="0" max="100" value="30">
+                    </div>
+
+                    <!-- Presets -->
+                    <div class="presets">
+                        <button class="preset-btn" data-preset="conservative">🛡️ Консервативный</button>
+                        <button class="preset-btn active" data-preset="balanced">⚖️ Сбалансированный</button>
+                        <button class="preset-btn" data-preset="market">📈 Рыночный</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="card result-card">
+                <h2 class="card-title">
+                    <span class="icon">✨</span>
+                    Результат расчёта
+                </h2>
+
+                <div class="final-price">
+                    <div class="final-price-label">Рекомендуемая стоимость</div>
+                    <div class="final-price-value" id="finalPrice">0 ₽</div>
+                    <div class="price-range">
+                        <span>от <strong id="priceLow">0 ₽</strong></span>
+                        <span>до <strong id="priceHigh">0 ₽</strong></span>
+                    </div>
+                </div>
+
+                <!-- Contribution Table -->
+                <div class="contribution-table">
+                    <div class="contribution-row header">
+                        <span>Источник</span>
+                        <span class="value">Цена</span>
+                        <span class="value">Вес</span>
+                        <span class="value">Вклад</span>
+                    </div>
+                    <div class="contribution-row" id="devRow">
+                        <span class="source">Разработчик</span>
+                        <span class="value" id="devPrice">0 ₽</span>
+                        <span class="value" id="devWeight">40%</span>
+                        <span class="value" id="devContrib">0 ₽</span>
+                    </div>
+                    <div class="contribution-row" id="indRow">
+                        <span class="source">Независимая</span>
+                        <span class="value" id="indPrice">0 ₽</span>
+                        <span class="value" id="indWeight">30%</span>
+                        <span class="value" id="indContrib">0 ₽</span>
+                    </div>
+                    <div class="contribution-row" id="mktRow">
+                        <span class="source">Рынок</span>
+                        <span class="value" id="mktPrice">0 ₽</span>
+                        <span class="value" id="mktWeight">30%</span>
+                        <span class="value" id="mktContrib">0 ₽</span>
+                    </div>
+                </div>
+
+                <!-- Visualization -->
+                <div class="viz-section">
+                    <div class="viz-title">📊 Влияние источников</div>
+                    
+                    <div class="viz-bar-container">
+                        <div class="viz-bar-header">
+                            <span>Разработчик</span>
+                            <span id="vizDevPercent">0%</span>
+                        </div>
+                        <div class="viz-bar">
+                            <div class="viz-bar-fill developer" id="vizDevBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="viz-bar-container">
+                        <div class="viz-bar-header">
+                            <span>Независимая оценка</span>
+                            <span id="vizIndPercent">0%</span>
+                        </div>
+                        <div class="viz-bar">
+                            <div class="viz-bar-fill independent" id="vizIndBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="viz-bar-container">
+                        <div class="viz-bar-header">
+                            <span>Рыночный минимум</span>
+                            <span id="vizMktPercent">0%</span>
+                        </div>
+                        <div class="viz-bar">
+                            <div class="viz-bar-fill market" id="vizMktBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions">
+                    <button class="btn btn-primary" id="copyBtn">📋 Копировать</button>
+                    <button class="btn btn-secondary" id="printBtn">🖨️ Печать</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <div class="info-card">
+                <h3>💡 Как использовать эту цену?</h3>
+                <p>Рассчитанная стоимость — это взвешенная оценка, основанная на трёх источниках данных. Вы можете использовать её:</p>
+                <ul>
+                    <li><strong>В переговорах</strong> — как аргументированную отправную точку</li>
+                    <li><strong>Для внутреннего учёта</strong> — как зафиксированную стоимость проекта</li>
+                    <li><strong>Для будущих проектов</strong> — как ориентир при оценке аналогичных задач</li>
+                </ul>
+                <p style="margin-top: 12px;">Диапазон цен (±10%) учитывает возможные колебания и переговорную гибкость.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 Калькулятор оценки стоимости сайта. Все расчёты носят рекомендательный характер.</p>
+    </footer>
+
+    <script>
+        // Currency configurations
+        const currencies = {
+            RUB: { symbol: '₽', name: 'Рубли', position: 'after' },
+            USD: { symbol: '$', name: 'Доллары', position: 'before' },
+            EUR: { symbol: '€', name: 'Евро', position: 'before' }
+        };
+
+        let currentCurrency = 'RUB';
+
+        // Preset configurations
+        const presets = {
+            conservative: { developer: 50, independent: 30, market: 20 },
+            balanced: { developer: 40, independent: 30, market: 30 },
+            market: { developer: 25, independent: 25, market: 50 }
+        };
+
+        // DOM Elements
+        const developerPriceInput = document.getElementById('developerPrice');
+        const independentPriceInput = document.getElementById('independentPrice');
+        const marketPriceInput = document.getElementById('marketPrice');
+
+        const developerWeightInput = document.getElementById('developerWeight');
+        const independentWeightInput = document.getElementById('independentWeight');
+        const marketWeightInput = document.getElementById('marketWeight');
+
+        const developerWeightValue = document.getElementById('developerWeightValue');
+        const independentWeightValue = document.getElementById('independentWeightValue');
+        const marketWeightValue = document.getElementById('marketWeightValue');
+
+        const weightTotal = document.getElementById('weightTotal');
+
+        const finalPriceEl = document.getElementById('finalPrice');
+        const priceLowEl = document.getElementById('priceLow');
+        const priceHighEl = document.getElementById('priceHigh');
+
+        const currencySymbols = [
+            document.getElementById('currencySymbol1'),
+            document.getElementById('currencySymbol2'),
+            document.getElementById('currencySymbol3')
+        ];
+
+        // Format number as currency
+        function formatCurrency(value, showDecimals = false) {
+            const currency = currencies[currentCurrency];
+            const formattedNumber = new Intl.NumberFormat('ru-RU', {
+                minimumFractionDigits: showDecimals ? 2 : 0,
+                maximumFractionDigits: showDecimals ? 2 : 0
+            }).format(value);
+
+            if (currency.position === 'before') {
+                return `${currency.symbol}${formattedNumber}`;
+            }
+            return `${formattedNumber} ${currency.symbol}`;
+        }
+
+        // Round to nearest 1000
+        function roundToThousand(value) {
+            return Math.round(value / 1000) * 1000;
+        }
+
+        // Calculate weighted price
+        function calculate() {
+            const devPrice = parseFloat(developerPriceInput.value) || 0;
+            const indPrice = parseFloat(independentPriceInput.value) || 0;
+            const mktPrice = parseFloat(marketPriceInput.value) || 0;
+
+            const devWeight = parseFloat(developerWeightInput.value) / 100;
+            const indWeight = parseFloat(independentWeightInput.value) / 100;
+            const mktWeight = parseFloat(marketWeightInput.value) / 100;
+
+            // Calculate contributions
+            const devContrib = devPrice * devWeight;
+            const indContrib = indPrice * indWeight;
+            const mktContrib = mktPrice * mktWeight;
+
+            // Total weighted price
+            const totalPrice = devContrib + indContrib + mktContrib;
+            const roundedPrice = roundToThousand(totalPrice);
+
+            // Range (±10%)
+            const priceLow = roundToThousand(roundedPrice * 0.9);
+            const priceHigh = roundToThousand(roundedPrice * 1.1);
+
+            // Update display
+            finalPriceEl.textContent = formatCurrency(roundedPrice);
+            priceLowEl.textContent = formatCurrency(priceLow);
+            priceHighEl.textContent = formatCurrency(priceHigh);
+
+            // Update contribution table
+            document.getElementById('devPrice').textContent = formatCurrency(devPrice);
+            document.getElementById('devWeight').textContent = `${Math.round(devWeight * 100)}%`;
+            document.getElementById('devContrib').textContent = formatCurrency(Math.round(devContrib));
+
+            document.getElementById('indPrice').textContent = formatCurrency(indPrice);
+            document.getElementById('indWeight').textContent = `${Math.round(indWeight * 100)}%`;
+            document.getElementById('indContrib').textContent = formatCurrency(Math.round(indContrib));
+
+            document.getElementById('mktPrice').textContent = formatCurrency(mktPrice);
+            document.getElementById('mktWeight').textContent = `${Math.round(mktWeight * 100)}%`;
+            document.getElementById('mktContrib').textContent = formatCurrency(Math.round(mktContrib));
+
+            // Update visualization bars
+            const maxContrib = Math.max(devContrib, indContrib, mktContrib, 1);
+            
+            if (totalPrice > 0) {
+                const devPercent = (devContrib / totalPrice) * 100;
+                const indPercent = (indContrib / totalPrice) * 100;
+                const mktPercent = (mktContrib / totalPrice) * 100;
+
+                document.getElementById('vizDevBar').style.width = `${devPercent}%`;
+                document.getElementById('vizIndBar').style.width = `${indPercent}%`;
+                document.getElementById('vizMktBar').style.width = `${mktPercent}%`;
+
+                document.getElementById('vizDevPercent').textContent = `${Math.round(devPercent)}%`;
+                document.getElementById('vizIndPercent').textContent = `${Math.round(indPercent)}%`;
+                document.getElementById('vizMktPercent').textContent = `${Math.round(mktPercent)}%`;
+            } else {
+                document.getElementById('vizDevBar').style.width = '0%';
+                document.getElementById('vizIndBar').style.width = '0%';
+                document.getElementById('vizMktBar').style.width = '0%';
+                document.getElementById('vizDevPercent').textContent = '0%';
+                document.getElementById('vizIndPercent').textContent = '0%';
+                document.getElementById('vizMktPercent').textContent = '0%';
+            }
+
+            // Animate final price
+            finalPriceEl.classList.remove('pulse');
+            void finalPriceEl.offsetWidth; // Trigger reflow
+            finalPriceEl.classList.add('pulse');
+        }
+
+        // Update weight display and validate total
+        function updateWeights() {
+            const devWeight = parseInt(developerWeightInput.value);
+            const indWeight = parseInt(independentWeightInput.value);
+            const mktWeight = parseInt(marketWeightInput.value);
+
+            developerWeightValue.textContent = `${devWeight}%`;
+            independentWeightValue.textContent = `${indWeight}%`;
+            marketWeightValue.textContent = `${mktWeight}%`;
+
+            const total = devWeight + indWeight + mktWeight;
+            weightTotal.textContent = `${total}%`;
+
+            if (total === 100) {
+                weightTotal.classList.remove('invalid');
+                weightTotal.classList.add('valid');
+            } else {
+                weightTotal.classList.remove('valid');
+                weightTotal.classList.add('invalid');
+            }
+
+            // Clear preset selection if weights don't match
+            updatePresetSelection();
+
+            calculate();
+        }
+
+        // Auto-adjust weights to sum to 100%
+        function autoAdjustWeights(changedInput) {
+            const devWeight = parseInt(developerWeightInput.value);
+            const indWeight = parseInt(independentWeightInput.value);
+            const mktWeight = parseInt(marketWeightInput.value);
+            const total = devWeight + indWeight + mktWeight;
+
+            if (total !== 100) {
+                const diff = 100 - total;
+                
+                if (changedInput === developerWeightInput) {
+                    // Adjust independent and market proportionally
+                    const otherTotal = indWeight + mktWeight;
+                    if (otherTotal > 0) {
+                        const indNew = Math.max(0, Math.min(100, indWeight + Math.round(diff * indWeight / otherTotal)));
+                        const mktNew = Math.max(0, Math.min(100, 100 - devWeight - indNew));
+                        independentWeightInput.value = indNew;
+                        marketWeightInput.value = mktNew;
+                    }
+                } else if (changedInput === independentWeightInput) {
+                    const otherTotal = devWeight + mktWeight;
+                    if (otherTotal > 0) {
+                        const devNew = Math.max(0, Math.min(100, devWeight + Math.round(diff * devWeight / otherTotal)));
+                        const mktNew = Math.max(0, Math.min(100, 100 - indWeight - devNew));
+                        developerWeightInput.value = devNew;
+                        marketWeightInput.value = mktNew;
+                    }
+                } else {
+                    const otherTotal = devWeight + indWeight;
+                    if (otherTotal > 0) {
+                        const devNew = Math.max(0, Math.min(100, devWeight + Math.round(diff * devWeight / otherTotal)));
+                        const indNew = Math.max(0, Math.min(100, 100 - mktWeight - devNew));
+                        developerWeightInput.value = devNew;
+                        independentWeightInput.value = indNew;
+                    }
+                }
+            }
+
+            updateWeights();
+        }
+
+        // Check which preset matches current weights
+        function updatePresetSelection() {
+            const devWeight = parseInt(developerWeightInput.value);
+            const indWeight = parseInt(independentWeightInput.value);
+            const mktWeight = parseInt(marketWeightInput.value);
+
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                const preset = presets[btn.dataset.preset];
+                if (preset.developer === devWeight && 
+                    preset.independent === indWeight && 
+                    preset.market === mktWeight) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Apply preset
+        function applyPreset(presetName) {
+            const preset = presets[presetName];
+            developerWeightInput.value = preset.developer;
+            independentWeightInput.value = preset.independent;
+            marketWeightInput.value = preset.market;
+            updateWeights();
+        }
+
+        // Switch currency
+        function switchCurrency(currency) {
+            currentCurrency = currency;
+            const symbol = currencies[currency].symbol;
+            
+            currencySymbols.forEach(el => {
+                el.textContent = symbol;
+            });
+
+            document.querySelectorAll('.currency-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.currency === currency);
+            });
+
+            calculate();
+        }
+
+        // Copy result to clipboard
+        function copyResult() {
+            const devPrice = parseFloat(developerPriceInput.value) || 0;
+            const indPrice = parseFloat(independentPriceInput.value) || 0;
+            const mktPrice = parseFloat(marketPriceInput.value) || 0;
+
+            const devWeight = parseInt(developerWeightInput.value);
+            const indWeight = parseInt(independentWeightInput.value);
+            const mktWeight = parseInt(marketWeightInput.value);
+
+            const finalPrice = finalPriceEl.textContent;
+            const priceLow = priceLowEl.textContent;
+            const priceHigh = priceHighEl.textContent;
+
+            const text = `📊 Оценка стоимости проекта
+
+💰 Рекомендуемая цена: ${finalPrice}
+📈 Диапазон: от ${priceLow} до ${priceHigh}
+
+📋 Исходные данные:
+• Запрос разработчика: ${formatCurrency(devPrice)} (вес: ${devWeight}%)
+• Независимая оценка: ${formatCurrency(indPrice)} (вес: ${indWeight}%)
+• Рыночный минимум: ${formatCurrency(mktPrice)} (вес: ${mktWeight}%)
+
+Расчёт выполнен с помощью Калькулятора оценки стоимости сайта`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copyBtn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅ Скопировано!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        // Event Listeners
+        developerPriceInput.addEventListener('input', calculate);
+        independentPriceInput.addEventListener('input', calculate);
+        marketPriceInput.addEventListener('input', calculate);
+
+        developerWeightInput.addEventListener('input', () => autoAdjustWeights(developerWeightInput));
+        independentWeightInput.addEventListener('input', () => autoAdjustWeights(independentWeightInput));
+        marketWeightInput.addEventListener('input', () => autoAdjustWeights(marketWeightInput));
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+        });
+
+        document.querySelectorAll('.currency-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchCurrency(btn.dataset.currency));
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', copyResult);
+        document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+        // Prevent negative numbers
+        [developerPriceInput, independentPriceInput, marketPriceInput].forEach(input => {
+            input.addEventListener('change', () => {
+                if (parseFloat(input.value) < 0) {
+                    input.value = 0;
+                }
+                calculate();
+            });
+        });
+
+        // Initial calculation
+        calculate();
+    </script>
+</body>
+</html>
